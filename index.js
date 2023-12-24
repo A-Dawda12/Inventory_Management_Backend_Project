@@ -20,6 +20,8 @@ const productController = new ProductController()
 server.get('/', productController.getProducts);
 server.get('/new', productController.getAddForm);
 server.post('/', validateRequest, productController.addnewProduct);
+server.get('/update-product/:id', productController.getUpdateProductView);
+server.post('/update-product', productController.postUpdateProduct)
 
 server.listen(3040, () => {
     console.log("server is listening on 3040");
