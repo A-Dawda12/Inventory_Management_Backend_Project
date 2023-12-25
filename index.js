@@ -5,6 +5,8 @@ import ejsLayouts from 'express-ejs-layouts';
 import path from 'path';
 
 const server = express();
+
+server.use(express.static('public'));
 //parse form data
 server.use(express.urlencoded({extended: true}));
 
@@ -21,7 +23,8 @@ server.get('/', productController.getProducts);
 server.get('/new', productController.getAddForm);
 server.post('/', validateRequest, productController.addnewProduct);
 server.get('/update-product/:id', productController.getUpdateProductView);
-server.post('/update-product', productController.postUpdateProduct)
+server.post('/update-product', productController.postUpdateProduct);
+server.post('/delete-product/:id', productController.deleteProduct)
 
 server.listen(3040, () => {
     console.log("server is listening on 3040");
