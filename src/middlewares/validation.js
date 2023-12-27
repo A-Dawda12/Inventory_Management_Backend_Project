@@ -2,29 +2,18 @@ import { body, validationResult } from "express-validator";
 
 export const validateRequest = async (req, res, next) => {
 
-    // const {name, price, imgUrl} = req.body;
-    // let errors = [];
-    // if(!name || name.trim() === ''){
-    //     errors.push("Name is required")
-    // }
-    // if(!price || parseFloat(price) < 1){
-    //     errors.push("Price must be positive value")
-    // }
-    // try {
-    //     const validUrl = new URL(imgUrl)
-    // } catch (error) {
-    //     errors.push("Url is invalid")
-    // }
-    // if(errors.length >= 0){
-    //     return res.render("new-product", {errorMessage : errors[0]});
-    // }
-
     //using express-validator instead of basic js to validate
 
     const rules = [
         body('name').notEmpty().withMessage('Name is required'),
         body('price').isFloat({ gt: 0 }).withMessage('Price should be a positive value'),
         // body('imgUrl').isURL().withMessage('Invalid url')
+        body('imgUrl').custom((value, {req}) => {
+            if(!req.file){
+                throw new Error("Image is required");
+            }
+            return true;
+        })
     ];
 
     // 2. run those rules.

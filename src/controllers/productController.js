@@ -1,4 +1,4 @@
-import path from 'path';
+// import path from 'path';
 import ProductModel from '../models/products.js';
 
 export default class ProductController {
@@ -14,10 +14,15 @@ export default class ProductController {
     }
 
     addnewProduct(req, res){
-        console.log(req.body);
-        ProductModel.add(req.body);
-        let products = ProductModel.get();
-        res.render('index', {products, layout : 'layout'});
+        // console.log(req.body);
+        // ProductModel.add(req.body);
+        // let products = ProductModel.get();
+        // res.render('index', {products, layout : 'layout'});
+        const {name, desc, price} = req.body;
+        const imgUrl = `images/${req.file.filename}`;
+        ProductModel.add(name, desc, price, imgUrl);
+        var products = ProductModel.get();
+        res.render('index', {products});
     }
 
     getUpdateProductView(req, res){
