@@ -1,32 +1,50 @@
-import express from 'express'
+import express from 'express';
 import ProductController from './src/controllers/productController.js';
+import UserController from './src/controllers/userController.js';
 import { validateRequest } from './src/middlewares/validation.js';
-import {uploadFile} from './src/middlewares/file-upload.js';
+import { auth } from './src/middlewares/authMiddleware.js';
+import { uploadFile } from './src/middlewares/file-upload.js';
+import { setLastVisit } from './src/middlewares/lastVisitMiddleware.js';
 import ejsLayouts from 'express-ejs-layouts';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 
 const server = express();
-
 server.use(express.static('public'));
-//parse form data
-server.use(express.urlencoded({extended: true}));
+server.use(cookieParser());
+//server.use(setLastVisit);
 
-server.use(express.static('src/views'))
+server.use(session({
+    secret:'SecretKey',
+    resave: false,
+    saveUninitialized: true,
+    cookie:{secure:false},
+}));
 
-server.set("view engine", "ejs");
-server.set("views", path.join(path.resolve(), "src", "views"));
+
+server.use(express.urlencoded({ extended: true }));
+server.use(express.static('src/views'));
+server.set('view engine', 'ejs');
+server.set('views', path.join(path.resolve(), 'src', 'views'));
 server.use(ejsLayouts);
 
-//create instance 
-const productController = new ProductController()
+const productController = new ProductController();
+const userController = new UserController(); 
 
-server.get('/', productController.getProducts);
-server.get('/new', productController.getAddForm);
-server.post('/', uploadFile.single('imgUrl'), validateRequest, productController.addnewProduct);
-server.get('/update-product/:id', productController.getUpdateProductView);
-server.post('/update-product', productController.postUpdateProduct);
-server.post('/delete-product/:id', productController.deleteProduct)
+server.get('/register', userController.getRegister); 
+server.get('/login', userController.getLogin);
+server.post('/login', userController.postLogin);
+server.post('/register', userController.postRegister);
+server.get('/logout', userController.logout);
+server.get('/', setLastVisit, auth,  productController.getProducts);
+server.get('/new', auth, productController.getAddForm);
+server.post('/', auth, uploadFile.single('imgUrl'), validateRequest, productController.addnewProduct);
+server.get('/update-product/:id', auth, productController.getUpdateProductView);
+server.post('/update-product', auth, productController.postUpdateProduct);
+server.post('/delete-product/:id', auth, productController.deleteProduct);
+
 
 server.listen(3040, () => {
-    console.log("server is listening on 3040");
+    console.log('Server is listening on port 3040');
 });

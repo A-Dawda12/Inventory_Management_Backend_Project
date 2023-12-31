@@ -5,12 +5,12 @@ export default class ProductController {
     getProducts(req, res){
         let products = ProductModel.get()
         // console.log(products);
-        res.render("index", {products, layout : 'layout'});
+        res.render("index", {products, userEmail : req.session.userEmail, layout : 'layout'});
         // return res.sendFile(path.join(path.resolve(), "src", "views", "products.html"))
     }
 
     getAddForm(req, res){
-        res.render('new-product', {errorMessage : null, layout : 'layout'});
+        res.render('new-product', {errorMessage : null, userEmail : req.session.userEmail, layout : 'layout'});
     }
 
     addnewProduct(req, res){
@@ -22,7 +22,7 @@ export default class ProductController {
         const imgUrl = `images/${req.file.filename}`;
         ProductModel.add(name, desc, price, imgUrl);
         var products = ProductModel.get();
-        res.render('index', {products});
+        res.render('index', {products, userEmail : req.session.userEmail});
     }
 
     getUpdateProductView(req, res){
@@ -33,6 +33,7 @@ export default class ProductController {
           res.render('update-product', {
             product: productFound,
             errorMessage: null,
+            userEmail : req.session.userEmail
           });
         }
         // 2. else return errors.
@@ -44,7 +45,7 @@ export default class ProductController {
     postUpdateProduct(req, res){
         ProductModel.update(req.body);
         var products = ProductModel.get();
-        res.render('index', {products});
+        res.render('index', {products, userEmail : req.session.userEmail});
     }
 
     deleteProduct(req, res){
@@ -55,6 +56,6 @@ export default class ProductController {
         }
         ProductModel.delete(id);
         var products = ProductModel.get();
-        res.render('index', {products});
+        res.render('index', {products, userEmail : req.session.userEmail});
     }
 }
